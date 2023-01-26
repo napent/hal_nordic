@@ -44,6 +44,9 @@
 
 #include "nrf.h"
 
+#include <zephyr/kernel.h>
+#include <zephyr/sys/reboot.h>
+
 void __assert_func(const char * file, int line, const char * func, const char * cond)
 {
     (void)file;
@@ -54,6 +57,14 @@ void __assert_func(const char * file, int line, const char * func, const char * 
 #if defined(ENABLE_DEBUG_ASSERT_BKPT) && (ENABLE_DEBUG_ASSERT_BKPT != 0)
     __BKPT(0);
 #endif
+
+    printk("file: %s, line %d", file, line);
+    printk("function: %s, condition %s", func, cond);
+
+    k_sleep(K_SECONDS(5));
+
+    sys_reboot(SYS_REBOOT_COLD);
+
     __disable_irq();
 
     // coverity[no_escape]
